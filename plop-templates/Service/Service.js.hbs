@@ -1,0 +1,26 @@
+import requests from './httpService';
+
+const {{pascalCase name}}Services = {
+  addOne(body) {
+    return requests.post('/{{lowerCase name}}-admin/add', body);
+  },
+  getAll({page, limit}) {
+    return requests.get(`/{{lowerCase name}}-admin?page=${page}&limit=${limit}`);
+  },
+  getById(id) {
+    return requests.get(`/{{lowerCase name}}-admin/${id}`);
+  },
+
+  updateOne(id, body) {
+    return requests.post(`/{{lowerCase name}}-admin/${id}`, body);
+  },
+  deleteOne(id) {
+    return requests.delete(`/{{lowerCase name}}-admin/${id}`);
+  },
+    updateStatus(id, body) {
+    return requests.put(`/{{lowerCase name}}-admin/status/${id}`, body);
+  },
+
+};
+
+export default {{pascalCase name}}Services;

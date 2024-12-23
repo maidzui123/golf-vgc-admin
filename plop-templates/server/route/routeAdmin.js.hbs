@@ -1,0 +1,33 @@
+const express = require('express');
+const router = express.Router();
+
+const controller = require("../controller/{{camelCase name}}AdminController");
+
+//add a product
+router.post("/add", controller.addOne);
+
+//add multiple products
+router.post("/all", controller.addMany);
+
+//get a product
+router.get("/:id", controller.getById);
+
+//get all products
+router.get("/", controller.getAll);
+
+//update a product
+router.post("/:id", controller.updateOne);
+
+//update many products
+router.post("/update/many", controller.updateMany);
+
+//update a product status
+router.put("/status/:id", controller.updateStatus);
+
+//delete a product
+router.delete("/:id", controller.deleteOne);
+
+//delete many product
+router.patch("/delete/many", controller.deleteMany);
+
+module.exports = router;

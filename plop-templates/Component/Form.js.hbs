@@ -1,0 +1,32 @@
+import React from 'react';
+import { Select } from '@windmill/react-ui';
+import useAsync from '../../hooks/useAsync';
+import {{pascalCase name}}Services from '../../services/{{pascalCase name}}Services';
+import { useTranslation } from "react-i18next";
+
+const Select{{pascalCase name}} = ({ set{{pascalCase name}}, register, name, label }) => {
+  const { data: {{camelCase name}}s, loading } = useAsync({{pascalCase name}}Services.getAll);
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <Select
+        onChange={(e) => set{{pascalCase name}}(e.target.value)}
+        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+        name={name}
+        {...register(`${name}`, {
+          required: t("{{label}} is required!", { label: label }),
+        })}
+      >
+        <option value="" defaultValue hidden>
+          {t("Choose {{pascalCase name}}")}
+        </option>
+        { {{camelCase name}}s.map(e => (
+          <option value={e._id}>{e.name}</option>
+        ))}
+      </Select>
+    </>
+  );
+};
+
+export default Select{{pascalCase name}};

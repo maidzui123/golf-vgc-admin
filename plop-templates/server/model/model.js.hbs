@@ -1,0 +1,22 @@
+const mongoose = require('mongoose');
+let softDelete = require('mongoosejs-soft-delete');
+const schema = mongoose.Schema;
+const {{camelCase name}}Schema = new mongoose.Schema(
+  {
+    name: { type: String, required: true},
+    description: { type: String, required: false},
+    status: { type: String, enum: ['show', 'hide'], default: 'show', },
+    created_by : { type: schema.Types.ObjectId, ref: 'Admin' },
+    updated_by : { type: schema.Types.ObjectId, ref: 'Admin' },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// plugin soft delete
+{{camelCase name}}Schema.plugin(softDelete) //Without passing any parameters.
+
+const {{pascalCase name}} = mongoose.models.{{pascalCase name}} || mongoose.model('{{pascalCase name}}', {{camelCase name}}Schema);
+
+module.exports = {{pascalCase name}};

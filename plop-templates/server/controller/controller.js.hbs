@@ -1,0 +1,216 @@
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+const {{pascalCase name}}Schema = require('../models/{{pascalCase name}}Schema');
+const i18n = require("i18n");
+const addOne = async (req, res, next) => {
+  try {
+    let one = req.body.data;
+     one.created_by = req.user._id;
+    if (isAdded) {
+      next(err)
+    } else {
+      let newOne = new {{pascalCase name}}Schema(one);
+      newOne = await newOne.save();
+      res.status(200).send({
+        success: true,
+        data: newOne,
+        message: res.__('Data Added Successfully!'),
+      });
+    }
+  } catch (err) {
+    next(err)
+  }
+};
+
+
+const addOneAdmin = async (req, res, next) => {
+  try {
+     let one = req.body.data;
+     one.created_by = req.user._id;
+
+    const isAdded = await {{pascalCase name}}Schema.findOne({ name: req.body.data.name });
+    if (isAdded) {
+      next(err)
+    } else {
+      const newOne = new {{pascalCase name}}Schema(one);
+      await newOne.save();
+      res.status(200).send({
+        message: res.__('Data Added Successfully!'),
+      });
+    }
+  } catch (err) {
+    next(err)
+  }
+};
+
+
+const getAll = async (req, res, next) => {
+  try {
+    const { page, size } = req.query;
+    const {{lowerCase name}} = await {{pascalCase name}}Schema.find({})
+      .select('name')
+      .sort({ _id: -1 })
+      .skip(page * size)
+      .limit(+size)
+      
+    return res.send({
+      success: true,
+      message: res.__("Success"),
+      data: {{lowerCase name}}
+    });
+  } catch (err) {
+    next(err)
+  }
+};
+
+
+const getAllAdmin = async (_req, res, next) => {
+  try {
+    const {{lowerCase name}} = await {{pascalCase name}}Schema.find({}).sort({ _id: -1 });
+    res.send({{lowerCase name}});
+  } catch (err) {
+    next(err)
+  }
+};
+
+const getById = async (req, res, next) => {
+  try {
+    const one = await {{pascalCase name}}Schema.findById(req.params.id);
+    return res.send({
+      success: true,
+      message: res.__("Success"),
+      data: one
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getByIdAdmin = async (req, res, next) => {
+  try {
+    const one = await {{pascalCase name}}Schema.findById(req.params.id);
+    res.send(one);
+  } catch (err) {
+    next(err)
+  }
+};
+
+const updateStatus = (req, res, next) => {
+  try{
+    const newStatus = req.body.status;
+
+    {{pascalCase name}}Schema.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          status: newStatus,
+          updated_by: req.user._id
+        },
+      },
+      (err) => {
+        if (err) {
+          next(err)
+        } else {
+          res.status(200).send({
+            success: true,
+            message: res.__('Data updated Successfully!'),
+          });
+        }
+      }
+    );
+  }
+  catch (err) {
+    next(err)
+  }
+};
+
+
+const updateOne = async (req, res, next) => {
+  try {
+    let updateOne = req.body.data;
+    updateOne.updated_by = req.user._id;
+    const one = await {{pascalCase name}}Schema.findByIdAndUpdate(
+      req.params.id,
+      { 
+        $set: updateOne
+
+       },
+      {
+        new: true,
+      }
+    );
+    return res.send({
+      success: true,
+      message: res.__("Success"),
+      data: one
+    });
+  } catch (err) {
+    next(err)
+  }
+};
+const updateOneAdmin = async (req, res, next) => {
+  try {
+    let updateOne = req.body.data;
+    updateOne.updated_by = req.user._id;
+    const one = await {{pascalCase name}}Schema.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateOne },
+      {
+        new: true,
+      }
+    );
+    if (one) {
+      res.send(one);
+    }
+  } catch (err) {
+    next(err)
+  }
+};
+
+const deleteOne = (req, res, next) => {
+  try{
+    {{pascalCase name}}Schema.removeOne({ _id: req.params.id }, (err) => {
+      if (err) {
+        next(err)
+      } else {
+        res.status(200).send({
+          success: true,
+          message: res.__('Data Deleted Successfully!'),
+        });
+      }
+    });
+  }catch (err) {
+    next(err)
+  }
+};
+const deleteOneAdmin = (req, res, next) => {
+  try{
+    {{pascalCase name}}Schema.removeOne({ _id: req.params.id }, (err) => {
+      if (err) {
+        next(err)
+      } else {
+        res.status(200).send({
+          message: res.__('Data Deleted Successfully!'),
+        });
+      }
+    });
+  }
+  catch (err) {
+    next(err)
+  }
+};
+
+module.exports = {
+  addOne,
+  addOneAdmin,
+  getAll,
+  getAllAdmin,
+  getById,
+  getByIdAdmin,
+  updateOne,
+  updateOneAdmin,
+  deleteOne,
+  deleteOneAdmin,
+  updateStatus
+};

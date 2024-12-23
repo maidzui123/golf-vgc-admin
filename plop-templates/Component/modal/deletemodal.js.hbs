@@ -1,0 +1,21 @@
+if (location.pathname === "/{{camelCase name}}s") {
+  // Check if 'ids' variable is defined
+  if (ids) {
+    const res = await {{pascalCase name}}Services.deleteMany({
+      ids: ids,
+    });
+    setIsUpdate(true);
+    notifySuccess(res.message);
+    setIsCheck([]);
+    closeModal();
+    setIsSubmitting(false);
+  } else {
+    const res = await {{pascalCase name}}Services.deleteOne(id);
+    setIsUpdate(true);
+    notifySuccess(res.message);
+    closeModal();
+    setIsSubmitting(false);
+  }
+}
+
+/** TODO: DELETEMODAL */

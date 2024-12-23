@@ -1,0 +1,9 @@
+  if (location.pathname === "/{{camelCase name}}s") {
+      {{pascalCase name}}Services.updateStatus(id, { status: newStatus })
+        .then((res) => {
+          setIsUpdate(true);
+          notifySuccess(res.message);
+        })
+        .catch((err) => notifyError(err.message));
+    }
+/** TODO: SHOWHIDEBUTTON*/

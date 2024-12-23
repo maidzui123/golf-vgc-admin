@@ -1,0 +1,216 @@
+const {{pascalCase name}}Schema = require("../models/{{pascalCase name}}Schema");
+const mongoose = require("mongoose");
+
+const {{camelCase name}}AdminController = {}
+
+{{camelCase name}}AdminController.addOne = async (req, res, next) => {
+  try {
+    const newOne = new {{pascalCase name}}Schema(req.body);
+    await newOne.save();
+    return res.send(newOne);
+  } catch (err) {
+    next(err)
+  }
+};
+
+{{camelCase name}}AdminController.addMany = async (req, res, next) => {
+  try {
+    // console.log('product data',req.body)
+    await {{pascalCase name}}Schema.deleteMany();
+    await {{pascalCase name}}Schema.insertMany(req.body);
+    return res.status(200).send({
+      message: "Added successfully!",
+    });
+  } catch (err) {
+    next(err)
+  }
+};
+
+
+{{camelCase name}}AdminController.getAll = async (req, res, next) => {
+  const { title, category, price, page, limit } = req.query;
+  //  console.log('title',title)
+  let queryObject = {};
+  let sortObject = {};
+  /*if (title) {
+    queryObject.$or = [
+      { "title.en": { $regex: `${title}`, $options: "i" } },
+      { "title.de": { $regex: `${title}`, $options: "i" } },
+      { "title.es": { $regex: `${title}`, $options: "i" } },
+      { "title.bn": { $regex: `${title}`, $options: "i" } },
+      { "title.sl": { $regex: `${title}`, $options: "i" } },
+    ];
+  }
+
+  if (price === "low") {
+    sortObject = {
+      "prices.originalPrice": 1,
+    };
+  } else if (price === "high") {
+    sortObject = {
+      "prices.originalPrice": -1,
+    };
+  } else if (price === "published") {
+    queryObject.status = "show";
+  } else if (price === "unPublished") {
+    queryObject.status = "hide";
+  } else if (price === "status-selling") {
+    queryObject.stock = { $gt: 0 };
+  } else if (price === "status-out-of-stock") {
+    queryObject.stock = { $lt: 1 };
+  } else if (price === "date-added-asc") {
+    sortObject.createdAt = 1;
+  } else if (price === "date-added-desc") {
+    sortObject.createdAt = -1;
+  } else if (price === "date-updated-asc") {
+    sortObject.updatedAt = 1;
+  } else if (price === "date-updated-desc") {
+    sortObject.updatedAt = -1;
+  } else {
+    sortObject = { _id: -1 };
+  }
+
+  */
+  const pages = Number(page);
+  const limits = Number(limit);
+  const skip = (pages - 1) * limits;
+
+  try {
+    const totalDoc = await {{pascalCase name}}Schema.countDocuments(queryObject);
+
+    const data = await {{pascalCase name}}Schema.find(queryObject)
+      .sort(sortObject)
+      .skip(skip)
+      .limit(limits);
+
+    return res.send({
+      data,
+      totalDoc,
+      limits,
+      pages,
+    });
+  } catch (err) {
+    // console.log("error", err);
+    next(err)
+  }
+};
+
+{{camelCase name}}AdminController.getById = async (req, res) => {
+  try {
+    const one = await {{pascalCase name}}Schema.findById(req.params.id)
+    return res.send(one);
+  } catch (err) {
+    next(err)
+  }
+};
+
+{{camelCase name}}AdminController.updateOne= async (req, res, next) => {
+  // console.log('update product')
+  // console.log('variant',req.body.variants)
+  try {
+    const one = await {{pascalCase name}}Schema.findById(req.params.id);
+
+    if (one) {
+      one = await {{pascalCase name}}Schema.findByIdAndUpdate(req.params.id,
+        {
+          $set: req.body
+        },
+        { new: true }
+      )
+      
+      await one.save();
+      return res.send({ data: one, message: "Updated successfully!" });
+    } else {
+      return res.status(404).send({
+        message: "Not Found!",
+      });
+    }
+  } catch (err) {
+    next(err)
+  }
+};
+
+
+{{camelCase name}}AdminController.updateMany = async (req, res, next) => {
+  try {
+    const updatedData = {};
+    for (const key of Object.keys(req.body)) {
+      if (
+        req.body[key] !== "[]" &&
+        Object.entries(req.body[key]).length > 0 &&
+        req.body[key] !== req.body.ids
+      ) {
+        // console.log('req.body[key]', typeof req.body[key]);
+        updatedData[key] = req.body[key];
+      }
+    }
+
+
+    await {{pascalCase name}}Schema.updateMany(
+      { _id: { $in: req.body.ids } },
+      {
+        $set: updatedData,
+      },
+      {
+        multi: true,
+      }
+    );
+    return res.send({
+      message: "Update successfully!",
+    });
+  } catch (err) {
+    next(err)
+  }
+};
+
+{{camelCase name}}AdminController.updateStatus = (req, res, next) => {
+  const newStatus = req.body.status;
+  {{pascalCase name}}Schema.updateOne(
+    { _id: req.params.id },
+    {
+      $set: {
+        status: newStatus,
+      },
+    },
+    (err) => {
+      if (err) {
+        return res.status(500).send({
+          message: err.message,
+        });
+      } else {
+        return res.status(200).send({
+          message: `${newStatus} Successfully!`,
+        });
+      }
+    }
+  );
+};
+
+{{camelCase name}}AdminController.deleteOne = (req, res, next) => {
+  {{pascalCase name}}Schema.deleteOne({ _id: req.params.id }, (err) => {
+    if (err) {
+      return res.status(500).send({
+        message: err.message,
+      });
+    } else {
+      return res.status(200).send({
+        message: "Deleted Successfully!",
+      });
+    }
+  });
+};
+
+
+{{camelCase name}}AdminController.deleteMany = async (req, res, next) => {
+  try {
+    await {{pascalCase name}}Schema.deleteMany({ _id: req.body.ids });
+
+    return res.send({
+      message: `Delete Successfully!`,
+    });
+  } catch (err) {
+    next(err)
+  }
+};
+
+module.exports = {{camelCase name}}AdminController;

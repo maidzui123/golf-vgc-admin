@@ -1,0 +1,11 @@
+if (location.pathname === "/{{camelCase name}}s") {
+      {{pascalCase name}}Services.deleteOne(id)
+        .then((res) => {
+          setIsUpdate(true);
+          notifySuccess(res.message);
+        })
+        .catch((err) => notifyError(err.message));
+      closeModal();
+      setServiceId();
+    }
+    /** TODO: MAINMODAL */
